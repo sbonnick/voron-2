@@ -5,6 +5,11 @@ this repository contains everything you need image, update and operate a voron 2
 ## Component Variants and Mods
 TBD
 
+
+## Wiring
+
+![wiring diagram](/assets/wiring.drawio.png)
+
 ## System Provisioning and Firmware
 
 ### Setup RasberryPi 4 and Essential Software

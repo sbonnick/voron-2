@@ -1,0 +1,170 @@
+version: "3.8"
+
+services:
+
+  traefik:
+    container_name: traefik
+    image: traefik:latest
+    restart: always
+    ports:
+      - "80:80"
+      #- "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    extra_hosts:
+      - host.docker.internal:172.17.0.1 # Needed to avoid Bad Gateway.
+    command:
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker=true"
+      - "--providers.docker.watch=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=proxyprotected"
+    networks:
+      - proxyprotected
+
+  files:
+    container_name: files
+    image: filebrowser/filebrowser:s6
+    restart: always
+    mem_limit: 512mb
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - FB_BASEURL=/host
+      - FB_NOAUTH=true
+    volumes:
+      - ${INSTALLDIR}:/srv
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.files.rule=PathPrefix(`/host`)"
+      - "traefik.http.routers.files.entrypoints=web" 
+    networks:
+      - proxyprotected
+
+  moonraker:
+    container_name: moonraker
+    image: mkuf/moonraker:latest
+    restart: always
+    user: "${PUID}:${PGID}"
+    depends_on:
+      - klipper
+      - traefik
+    volumes:
+      - /dev/null:/opt/klipper/config/null
+      - /dev/null:/opt/klipper/docs/null
+      - /run/dbus:/run/dbus
+      - /run/systemd:/run/systemd
+      - run:/opt/printer_data/run
+      - gcode:/opt/printer_data/gcodes
+      - ${INSTALLDIR}/klipper/config:/opt/printer_data/config
+      - ${INSTALLDIR}/klipper/moonraker-db:/opt/printer_data/database
+      - ${INSTALLDIR}/klipper/log:/opt/printer_data/logs
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.moonraker.loadbalancer.server.port=7125
+      - "traefik.http.routers.moonraker.rule=PathPrefix(`/websocket`,`/printer`,`/api`,`/access`,`/machine`,`/server`)"
+      - "traefik.http.routers.moonraker.entrypoints=web"
+    networks:
+      - proxyprotected
+
+  klipper:
+    container_name: klipper
+    image: mkuf/klipper:latest
+    restart: always
+    privileged: true
+    command:
+      - "-I"
+      - "printer_data/run/klipper.tty"
+      - "-a"
+      - "printer_data/run/klipper.sock"
+      - "printer_data/config/printer.cfg"
+      - "-l"
+      - "printer_data/logs/klippy.log"
+    devices:
+      - /dev/serial0:/dev/serial0
+      - /dev/serial1:/dev/serial1
+      - /dev/ttyAMA0:/dev/ttyAMA0
+    volumes:
+      - run:/opt/printer_data/run
+      - gcode:/opt/printer_data/gcodes
+      - ${INSTALLDIR}/klipper/config:/opt/printer_data/config
+      - ${INSTALLDIR}/klipper/log:/opt/printer_data/logs
+      - ${INSTALLDIR}/klipper/mods/z_calibration.py:/opt/klipper/klippy/extras/z_calibration.py
+    networks:
+      - proxyprotected
+
+  fluidd:
+    container_name: fluidd
+    image: cadriel/fluidd:latest
+    restart: always
+    depends_on:
+      - moonraker
+      - traefik
+    labels:
+      - traefik.enable=true
+      - "traefik.http.services.fluidd.loadbalancer.server.port=80"
+      - "traefik.http.routers.fluidd.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.fluidd.entrypoints=web"
+    networks:
+      - proxyprotected
+
+  ustreamer:
+    container_name: ustreamer
+    image: mkuf/ustreamer:latest
+    restart: always
+    privileged: true
+    ports:
+      - 9125:8080
+    command:
+      - "--host=0.0.0.0"
+      - "--port=8080"
+      - "--slowdown"
+      - "--device=/dev/webcam"
+      - "--resolution=1080x1440" #720x960"
+      - "--desired-fps=60" #15"
+      - "--format=MJPEG"
+#      - "--drop-same-frames=30" #15"
+    depends_on:
+      - traefik
+    devices:
+      - /dev/video0:/dev/webcam
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.ustreamer.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ustreamer.rule=PathPrefix(`/stream`)"
+      - "traefik.http.routers.ustreamer.entrypoints=web"
+    networks:
+      - proxyprotected
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '1.0'
+#          memory: 1G
+
+
+volumes:
+  run:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  gcode:
+
+networks:
+  proxyprotected:
+    driver: bridge
+    name: proxyprotected
+    driver_opts:
+      com.docker.network.bridge.name: proxyprotected
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/24  # TODO:  ENV
+
+secrets:
+  adminpwd:
+    file: /home/administrator/adminpwd
