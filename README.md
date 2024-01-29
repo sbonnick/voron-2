@@ -3,8 +3,31 @@
 this repository contains everything you need image, update and operate a voron 2.4r2 3D printer. There are several mods used on my current voron 2.4r2 setup. These mods will be made clear if they require code or system level changes. If you do not have specific mods I will attemp to make it clear what alternative configurations are needed when possable. 
 
 ## Component Variants and Mods
-TBD
 
+| Discription | Hardware Variants | Mods |
+| ------------|----------|---------------|
+| Linux PCB | Pi4 2G - piOS | heatsync, mount |
+| Main MCU PCB | BTT Octopus v1.1 | mount |
+| Toolhead PCB | BTT EBB 2240 CAN |  motor mount, pcb cover, cable chain arm |
+| USB to CAN   | BTT U2C | mount         |
+| Extruder Motor | LDO-36STH20 |         |
+| Z Motors | ? | |
+| A/B Motors | ? | |
+| Hotend | Voron Dragon HF | SB Dragon Mount |
+| A/B motor wiring | ? | cable clip |
+| Extrision support | Titanium Extrusion Backers | |
+| Kinematic Bed | ? | kinematic parts, drill mount |
+| Hotend cleaning | Purge Bucket for Kinematic | parts |
+| Run out sensor | BTT v1.2 Sensor | |
+| Exaust | ? | ? |
+| Air Filter | Nevermore v2 | ? |
+| X/Y Endstops | Mellow Hall PCB | Voron Hall Pod |
+| Probe / Z endstop | CNC Voron Tap v2 | hall sensor mount |
+| Misc. wiring |  | rails, mounts, ??? |
+| Misc. pannels |  | magnets mount top, hinges, bottom plate tabs |
+| power supply |  | side mounts, terminal cover |
+
+All mods are also stored in the stl folder for version locking. As I upgrade versions these will be upgraded as well based on the original authors revisions.
 
 ## Wiring
 
@@ -21,10 +44,7 @@ sudo apt-get install gcc-arm-none-eabi dfu-util
 
 ### Setup Toolhead MCU
 
-| Variants | Mods |
-|-----|-----------|
-| BTT EBB 2240 CAN | None |
-| BTT U2C | |
+To reduce wiring complexity and portability, I have replaced my hardwired toolhead with BTTs EBB 2240 CAN board. If you are using a hard wired setup using something like a Hartk PCB, you can ignore these setup steps since your toolhead will not have a independant MCU. Caution though, your wiring will look very different as a result. refer to a older check-in here if you want to see my legacy Hartk PCB setup.
 
 #### Setup U2C
 
@@ -81,9 +101,16 @@ python3 flash_can.py -i can0 -f ~/klipper/out/klipper.bin -u be69315a613c
 
 ### Setup Octopus MCU
 
-| Variants | Mods |
-|-----|-----------|
-| Octopus Pro | None |
+TBD
 
-## Klipper Configuration and Setup
+## Klipper Configuration
+
+TBD
+
+## Inital Setup and Test
+
+Once wiring and software are up and going, run through the tests on https://www.klipper3d.org/Config_checks.html
+
+## Slicing
+
 TBD

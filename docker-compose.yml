@@ -77,6 +77,7 @@ services:
     image: mkuf/klipper:latest
     restart: always
     privileged: true
+    network_mode: host
     command:
       - "-I"
       - "printer_data/run/klipper.tty"
@@ -94,9 +95,6 @@ services:
       - gcode:/opt/printer_data/gcodes
       - ${INSTALLDIR}/klipper/config:/opt/printer_data/config
       - ${INSTALLDIR}/klipper/log:/opt/printer_data/logs
-      - ${INSTALLDIR}/klipper/mods/z_calibration.py:/opt/klipper/klippy/extras/z_calibration.py
-    networks:
-      - proxyprotected
 
   fluidd:
     container_name: fluidd
