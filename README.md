@@ -34,7 +34,8 @@ All mods are also stored in the stl folder for version locking. As I upgrade ver
 
 | Description | Images |
 |-------------|--------|
-| Wiring for the Octopus. Note that currently the Octopus is using serial to communicate with the pi4. a future iteration I plan to switch back to usb connection or CAN | ![wiring diagram](/assets/wiring.drawio.png) ![octopus](/assets/octopus.jpg) |
+| Overall wiring diagram | ![wiring diagram](/assets/wiring.drawio.png) |
+| Wiring for the Octopus. Note that currently the Octopus is using serial to communicate with the pi4. a future iteration I plan to switch back to usb connection or CAN | ![octopus](/assets/octopus.jpg) |
 | When shortening the extruder wire, it will also require reordering the pins. Here is the order if its the LDO 20mm motor. If you use a different motor ensure you have the ordering correct | ![Extruder motor wiring](/assets/Emotor_wire.jpg) |
 | Wiring for BTT EBB 2240 CAN Toolhead. Using PT100 (set the dip switches!) LDO motor wired above, and a voron TAP | ![Toolhead wiring](/assets/toolhead.jpg) |
 | Overall view of underside of voron 2 fully wired with all mods in place | ![underside](/assets/underside.jpg)|
