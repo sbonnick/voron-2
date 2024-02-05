@@ -4,29 +4,30 @@ this repository contains everything you need image, update and operate a voron 2
 
 ## Component Variants and Mods
 
-| Description | Hardware Variants | Mods |
-| ------------|----------|---------------|
-| Linux PCB | Pi4 2G - piOS | heatsync, mount |
-| Main MCU PCB | BTT Octopus v1.1 | mount |
-| Toolhead PCB | BTT EBB 2240 CAN |  motor mount, pcb cover, cable chain arm |
-| USB to CAN   | BTT U2C | mount         |
-| Extruder Motor | LDO-36STH20 |         |
-| Z Motors | ? | |
-| A/B Motors | ? | |
-| Hotend | Voron Dragon HF | SB Dragon Mount |
-| A/B motor wiring | ? | cable clip |
-| Extrusion support | Titanium Extrusion Backers | |
-| Kinematic Bed | ? | kinematic parts, drill mount |
-| Hotend cleaning | Purge Bucket for Kinematic | parts |
-| Run out sensor | BTT v1.2 Sensor | |
-| Exhaust | ? | ? |
-| Air Filter | Nevermore v2 | ? |
-| X/Y Endstops | Mellow Hall PCB | Voron Hall Pod |
-| Probe / Z endstop | CNC Voron Tap v2 | hall sensor mount |
-| Misc. wiring mods |  | rails, mounts, ??? |
-| Misc. panel mods |  | magnets mount top, hinges, bottom plate tabs |
-| power supply mods |  | side mounts, terminal cover |
-| Thermistor | PT100 | |
+| Description | Hardware Variants | Mods | Software Impacts |
+| ------------|----------|---------------|------------------|
+| Linux PCB | Pi4 2G - piOS | heatsync, mount | Major |
+| Main MCU PCB | BTT Octopus Pro | mount | Major |
+| Toolhead PCB | BTT EBB 2240 CAN |  motor mount, pcb cover, cable chain arm | Major |
+| USB to CAN   | BTT U2C | mount         | Major |
+| Extruder Motor | LDO-36STH20 |         | |
+| Z Motors | ? | | |
+| A/B Motors | ? | | |
+| Hotend | Voron Dragon HF | SB Dragon Mount | |
+| A/B motor wiring | ? | cable clip | |
+| Extrusion support | Titanium Extrusion Backers | | |
+| Kinematic Bed | ? | kinematic parts, drill mount | |
+| Hotend cleaning | Purge Bucket for Kinematic | parts | Minor |
+| Run out sensor | BTT v1.2 Sensor | | Minor |
+| Exhaust | ? | ? | Minor |
+| Air Filter | Nevermore v2 | ? | Minor |
+| X/Y Endstops | Mellow Hall PCB | Voron Hall Pod | Minor |
+| Probe / Z endstop | CNC Voron Tap v2 | hall sensor mount | Major |
+| Misc. wiring mods |  | rails, mounts, ??? | |
+| Misc. panel mods |  | magnets mount top, hinges, bottom plate tabs | |
+| power supply mods |  | side mounts, terminal cover | |
+| Thermistor | PT100 | | Minor |
+| Web Camera | Logitech C920s | Top Mount | Major |
 
 All mods are also stored in the stl folder for version locking. As I upgrade versions these will be upgraded as well based on the original authors revisions.
 
@@ -110,7 +111,15 @@ python3 flash_can.py -i can0 -f ~/klipper/out/klipper.bin -u be69315a613c
 
 ### Setup Octopus MCU
 
-TBD
+1. Run the following commands, or jump to the next step if using the prebuilt binary
+```
+git clone https://github.com/Klipper3d/klipper.git
+cd klipper
+make -f ../configs/octopus.klipper.config
+cd ..
+```
+
+More Steps TBD
 
 ## Klipper Configuration
 
