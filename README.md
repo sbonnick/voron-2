@@ -1,10 +1,10 @@
 # voron-2
 
-this repository contains everything you need image, update and operate a voron 2.4r2 3D printer. There are several mods used on my current voron 2.4r2 setup. These mods will be made clear if they require code or system level changes. If you do not have specific mods I will attemp to make it clear what alternative configurations are needed when possable. 
+this repository contains everything you need image, update and operate a voron 2.4r2 3D printer. There are several mods used on my current voron 2.4r2 setup. These mods will be made clear if they require code or system level changes. If you do not have specific mods I will attempt to make it clear what alternative configurations are needed when possible. 
 
 ## Component Variants and Mods
 
-| Discription | Hardware Variants | Mods |
+| Description | Hardware Variants | Mods |
 | ------------|----------|---------------|
 | Linux PCB | Pi4 2G - piOS | heatsync, mount |
 | Main MCU PCB | BTT Octopus v1.1 | mount |
@@ -15,27 +15,28 @@ this repository contains everything you need image, update and operate a voron 2
 | A/B Motors | ? | |
 | Hotend | Voron Dragon HF | SB Dragon Mount |
 | A/B motor wiring | ? | cable clip |
-| Extrision support | Titanium Extrusion Backers | |
+| Extrusion support | Titanium Extrusion Backers | |
 | Kinematic Bed | ? | kinematic parts, drill mount |
 | Hotend cleaning | Purge Bucket for Kinematic | parts |
 | Run out sensor | BTT v1.2 Sensor | |
-| Exaust | ? | ? |
+| Exhaust | ? | ? |
 | Air Filter | Nevermore v2 | ? |
 | X/Y Endstops | Mellow Hall PCB | Voron Hall Pod |
 | Probe / Z endstop | CNC Voron Tap v2 | hall sensor mount |
 | Misc. wiring mods |  | rails, mounts, ??? |
-| Misc. pannel mods |  | magnets mount top, hinges, bottom plate tabs |
+| Misc. panel mods |  | magnets mount top, hinges, bottom plate tabs |
 | power supply mods |  | side mounts, terminal cover |
-| Themasistor | PT100 | |
+| Thermistor | PT100 | |
 
 All mods are also stored in the stl folder for version locking. As I upgrade versions these will be upgraded as well based on the original authors revisions.
 
 ## Wiring
 
-| Discription | Images |
+| Description | Images |
 |-------------|--------|
 | Wiring for the Octopus. Note that currently the Octopus is using serial to communicate with the pi4. a future iteration I plan to switch back to usb connection or CAN | ![wiring diagram](/assets/wiring.drawio.png) ![octopus](/assets/octopus.jpg) |
-| When shortening the extruder wire, it will also require reording the pins. Here is the order if its the LDO 20mm motor. If you use a different motor ensure you have the ordering correct | ![Extruder motor wiring](/assets/emotor_wire.jpg) |
+| When shortening the extruder wire, it will also require reordering the pins. Here is the order if its the LDO 20mm motor. If you use a different motor ensure you have the ordering correct | ![Extruder motor wiring](/assets/emotor_wire.jpg) |
+| Wiring for BTT EBB 2240 CAN Toolhead. Using PT100 (set the dip switches!) LDO motor wired above, and a voron TAP | ![Toolhead wiring](/assets/toolhead.jpg) |
 | Overall view of underside of voron 2 fully wired with all mods in place | ![underside](/assets/underside.jpg)|
 
 
@@ -51,7 +52,7 @@ sudo apt-get install gcc-arm-none-eabi dfu-util
 
 ### Setup Toolhead MCU
 
-To reduce wiring complexity and portability, I have replaced my hardwired toolhead with BTTs EBB 2240 CAN board. If you are using a hard wired setup using something like a Hartk PCB, you can ignore these setup steps since your toolhead will not have a independant MCU. Caution though, your wiring will look very different as a result. refer to a older check-in here if you want to see my legacy Hartk PCB setup.
+To reduce wiring complexity and portability, I have replaced my hardwired toolhead with BTTs EBB 2240 CAN board. If you are using a hard wired setup using something like a Hartk PCB, you can ignore these setup steps since your toolhead will not have a independent MCU. Caution though, your wiring will look very different as a result. refer to a older check-in here if you want to see my legacy Hartk PCB setup.
 
 #### Setup U2C
 
@@ -70,7 +71,7 @@ iface can0 can static
 
 #### Building and Installing Katapult (Canboot) on EBB
 
-1. Ensure 24V power and CAN lines are unpluged. Plug usb-c into the EBB 2240 and set the usb-c 5v power jumper
+1. Ensure 24V power and CAN lines are unplugged. Plug usb-c into the EBB 2240 and set the usb-c 5v power jumper
 2. Run the following commands, or jump to the next step if using the prebuilt binary
 ```
 git clone https://github.com/Arksine/katapult.git
@@ -118,7 +119,7 @@ TBD
 
 Once wiring and software are up and going, run through the tests on https://www.klipper3d.org/Config_checks.html
 
-Anytime something changes that can effect the thermals of the printer, pid calibration is needed. changing sensors, hotends, et woudl require this. The following command can be run in fluidd terminal and will output new pid values to be added into the printer.cfg. 
+Anytime something changes that can effect the thermals of the printer, pid calibration is needed. changing sensors, hotends, et would require this. The following command can be run in fluidd terminal and will output new pid values to be added into the printer.cfg. 
 ```
 PID_CALIBRATE HEATER=extruder TARGET=230
 
