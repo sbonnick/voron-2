@@ -2,6 +2,24 @@
 
 this repository contains everything you need image, update and operate a voron 2.4r2 3D printer. There are several mods used on my current voron 2.4r2 setup. These mods will be made clear if they require code or system level changes. If you do not have specific mods I will attempt to make it clear what alternative configurations are needed when possible. 
 
+## Roadmap
+
+This repo and doc is still missing some critical items to be fully up and running. some of these items that need to be dome before that milestone is reached are:
+
+- [ ] A few missing components like the A/B and Z motors
+- [ ] Add STLs and link to source
+- [ ] finish wiring for EBB
+- [ ] rewire octopus to use usb or CAN
+- [ ] identify the configuration items that need to be adjusted
+- [ ] script binary creation. use docker
+- [ ] add rpi4 setup
+- [ ] more details for the first init setup
+- [ ] need to add knomi v2
+- [ ] need to add chamber sensor
+- [ ] consider adding a heatup (120c) and clean of nozzle before the z calibration
+- [ ] tune web camera - framerate is slow
+
+
 ## Component Variants and Mods
 
 | Description | Hardware Variants | Mods | Software Impacts |
