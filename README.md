@@ -6,8 +6,6 @@ this repository contains everything you need image, update and operate a voron 2
 
 This repo and doc is still missing some critical items to be fully up and running. some of these items that need to be dome before that milestone is reached are:
 
-- [ ] Add STLs and link to source
-- [ ] finish wiring for EBB
 - [ ] rewire octopus to use usb or CAN
 - [ ] identify the configuration items that need to be adjusted
 - [ ] script binary creation. use docker
@@ -32,17 +30,17 @@ This repo and doc is still missing some critical items to be fully up and runnin
 | A/B Motors | LDO-42STH40 | [plug mounts](https://github.com/Ramalama2/Voron-2-Mods/tree/main/AB_Plugs), [cable clips](https://github.com/Ramalama2/Voron-2-Mods/tree/main/Misumi_Cable_Clip) | Minor |
 | Hotend | Voron Dragon HF | | |
 | Extrusion support | Titanium Extrusion Backers | | |
-| Kinematic Bed | ? | kinematic parts, drill mount | |
-| Hotend cleaning | Purge Bucket for Kinematic | parts | Minor |
+| Kinematic Bed |  | [kinematic parts](https://github.com/tanaes/whopping_Voron_mods/tree/main/kinematic_bed) | |
+| Hotend cleaning | nozzle scrubber | [Parts](https://github.com/VoronDesign/VoronUsers/tree/master/orphaned_mods/printer_mods/edwardyeeks/Decontaminator_Purge_Bucket_%26_Nozzle_Scrubber), [Purge Bucket for Kinematic](https://github.com/Dfdye/Voron_Mods/tree/main/Purge_Bucket_for_WP_Kinetic_Mount) | Minor |
 | Run out sensor | BTT v1.2 Sensor | | Minor |
 | Exhaust | ? | ? | Minor |
 | Air Filter | Nevermore 5 v2 | [parts](https://github.com/nevermore3d/Nevermore_Micro/tree/master/V5_Duo/V2) | Minor |
 | X/Y Endstops | Mellow Hall PCB | | Minor |
-| Probe / Z endstop | CNC Voron Tap v2 | hall sensor mount | Major |
-| Misc. wiring mods |  | rails, mounts, [underbed wagos](https://mods.vorondesign.com/detail/Zdq86RuSkhr4bx3xrauw) | |
-| Misc. case mods |  | [hinges](https://mods.vorondesign.com/detail/eeRCH8EJiLrIF5q5l3AQg), [lean supports](https://mods.vorondesign.com/detail/tiIhFDTh9tHJY0JNJK9A), [handles](https://mods.vorondesign.com/detail/EAM1ZiQJCUzXznvOA767w), magnets mount top, bottom panel tabs| |
-| Lights | | [mount segment](https://mods.vorondesign.com/detail/8S6KN4daUCgRhEJEX1stQ), [mount ends](https://github.com/Ramalama2/Voron-2-Mods/tree/main/Deprecated/Misumi_Led_Corners/STL), [idler corners](https://mods.vorondesign.com/detail/zBJTvWc9vSnnQoDDP0hyYw), base corners | |
-| power supply mods |  | side mounts, terminal cover | |
+| Probe / Z endstop | CNC Voron Tap v2 | [hall sensor mount](https://github.com/Chaoticlab/CNC-Tap-for-Voron/blob/master/STL/CNC_VORON_TAP_V2/V2%20Hall%20Sensor%20Adapter.STL) | Major |
+| Misc. wiring mods |  | [rails](https://mods.vorondesign.com/detail/ozerX2agbmmnjUP4EdDyQ), [underbed wagos](https://mods.vorondesign.com/detail/Zdq86RuSkhr4bx3xrauw) | |
+| Misc. case mods |  | [hinges](https://mods.vorondesign.com/detail/eeRCH8EJiLrIF5q5l3AQg), [lean supports](https://mods.vorondesign.com/detail/tiIhFDTh9tHJY0JNJK9A), [handles](https://mods.vorondesign.com/detail/EAM1ZiQJCUzXznvOA767w), [magnets mount top](https://www.teamfdm.com/files/file/324-magnetic-panels/), [bottom panel tabs](https://www.teamfdm.com/files/file/134-deck-panel-support-clips/) | |
+| Lights | | [mount segment](https://mods.vorondesign.com/detail/8S6KN4daUCgRhEJEX1stQ), [mount ends](https://github.com/Ramalama2/Voron-2-Mods/tree/main/Deprecated/Misumi_Led_Corners/STL), [idler corners](https://mods.vorondesign.com/detail/zBJTvWc9vSnnQoDDP0hyYw), [z corner covers](https://www.printables.com/model/84736-z-belt-cover-a-for-voron-24) | |
+| power supply mods |  | [double din mount](https://www.teamfdm.com/files/file/457-double-din-lrs200-24-mounts-for-voron-24/), [terminal cover](https://mods.vorondesign.com/detail/jyO8bHoPTy3XUaYlXscB7w) | |
 | Thermistor | PT100 | | Minor |
 | Web Camera | Logitech C920s | [Top Mount](https://mods.vorondesign.com/detail/XgriEYTt4Xl5LeDx5DnPRg) | Major |
 
