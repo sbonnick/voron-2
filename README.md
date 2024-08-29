@@ -32,7 +32,7 @@ This repo and doc is still missing some critical items to be fully up and runnin
 | Extrusion support | Titanium Extrusion Backers | | |
 | Kinematic Bed |  | [kinematic parts](https://github.com/tanaes/whopping_Voron_mods/tree/main/kinematic_bed) | |
 | Hotend cleaning | nozzle scrubber | [Parts](https://github.com/VoronDesign/VoronUsers/tree/master/orphaned_mods/printer_mods/edwardyeeks/Decontaminator_Purge_Bucket_%26_Nozzle_Scrubber), [Purge Bucket for Kinematic](https://github.com/Dfdye/Voron_Mods/tree/main/Purge_Bucket_for_WP_Kinetic_Mount) | Minor |
-| Run out sensor | BTT v1.2 Sensor | | Minor |
+| Run out sensor | BTT SFS v2.0 Sensor | [mount](https://www.printables.com/model/713155-bigtreetech-smart-filament-sensor-sfs-v20-2020-ext) | Minor |
 | Exhaust | ? | ? | Minor |
 | Air Filter | Nevermore 5 v2 | [parts](https://github.com/nevermore3d/Nevermore_Micro/tree/master/V5_Duo/V2) | Minor |
 | X/Y Endstops | Mellow Hall PCB | | Minor |
@@ -60,8 +60,11 @@ All mods are also stored in the stl folder for version locking. As I upgrade ver
 
 ## System Provisioning and Firmware
 
-### Setup RasberryPi 4 and Essential Software
-TBD
+### Setup RaspberryPi 4 and Essential Software
+
+Download the raspberry pi ![imaging tool](https://www.raspberrypi.com/software/) and follow the steps to edit settings for an appropriate hostname, username, password, timezone, and ssh to format a micro sd card. Then install into the raspberry pi. Follow the rest of the steps over SSH.
+
+TBD - work in progress
 
 ```
 sudo apt-get install gcc-arm-none-eabi dfu-util
