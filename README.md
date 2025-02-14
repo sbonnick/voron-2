@@ -145,7 +145,9 @@ TBD
 
 ## Inital Setup and Test
 
-Once wiring and software are up and going, run through the tests on https://www.klipper3d.org/Config_checks.html
+Once wiring and software are up and going, run through the tests and setup on:
+- https://www.klipper3d.org/Rotation_Distance.html
+- https://www.klipper3d.org/Config_checks.html
 
 Anytime something changes that can effect the thermals of the printer, pid calibration is needed. changing sensors, hotends, et would require this. The following command can be run in fluidd terminal and will output new pid values to be added into the printer.cfg. 
 ```
