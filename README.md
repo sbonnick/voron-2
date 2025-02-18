@@ -6,6 +6,7 @@ this repository contains everything you need image, update and operate a voron 2
 
 This repo and doc is still missing some critical items to be fully up and running. some of these items that need to be dome before that milestone is reached are:
 
+TODO:
 - [ ] rewire octopus to use usb or CAN
 - [ ] identify the configuration items that need to be adjusted
 - [ ] script binary creation. use docker
@@ -13,15 +14,17 @@ This repo and doc is still missing some critical items to be fully up and runnin
 - [ ] more details for the first init setup
 - [ ] need to add knomi v2
 - [ ] need to add chamber sensor
-- [ ] consider adding a heatup (120c) and clean of nozzle before the z calibration
+- [ ] consider adding a heat up (120c) and clean of nozzle before the z calibration
 - [ ] tune web camera - framerate is slow
+- [ ] create docker for katapult
+- [ ] fully automate upgrading binaries
 
 
 ## Component Variants and Mods
 
 | Description | Hardware Variants | Mods | Software Impacts |
 | ------------|----------|---------------|------------------|
-| Linux PCB | Pi4 2G - piOS | heatsync | Major |
+| Linux PCB | Pi4 2G - piOS | heat sync | Major |
 | Main MCU PCB | BTT Octopus Pro | | Major |
 | Toolhead PCB | BTT EBB 2240 CAN | [motor mount, pcb cover, cable chain arm](https://github.com/bigtreetech/EBB/tree/master/EBB%20SB2240_2209%20CAN/STL) | Major |
 | USB to CAN   | BTT U2C | [mount](https://mods.vorondesign.com/detail/guUSuCXHsOqPH1Xn5cS1Ag) | Major |
@@ -35,9 +38,9 @@ This repo and doc is still missing some critical items to be fully up and runnin
 | Run out sensor | BTT SFS v2.0 Sensor | [mount](https://www.printables.com/model/713155-bigtreetech-smart-filament-sensor-sfs-v20-2020-ext) | Minor |
 | Exhaust | ? | ? | Minor |
 | Air Filter | Nevermore 5 v2 | [parts](https://github.com/nevermore3d/Nevermore_Micro/tree/master/V5_Duo/V2) | Minor |
-| X/Y Endstops | Mellow Hall PCB | | Minor |
-| Probe / Z endstop | CNC Voron Tap v2 | [hall sensor mount](https://github.com/Chaoticlab/CNC-Tap-for-Voron/blob/master/STL/CNC_VORON_TAP_V2/V2%20Hall%20Sensor%20Adapter.STL) | Major |
-| Misc. wiring mods |  | [rails](https://mods.vorondesign.com/detail/ozerX2agbmmnjUP4EdDyQ), [underbed wagos](https://mods.vorondesign.com/detail/Zdq86RuSkhr4bx3xrauw) | |
+| X/Y End stops | Mellow Hall PCB | | Minor |
+| Probe / Z end stop | CNC Voron Tap v2 | [hall sensor mount](https://github.com/Chaoticlab/CNC-Tap-for-Voron/blob/master/STL/CNC_VORON_TAP_V2/V2%20Hall%20Sensor%20Adapter.STL) | Major |
+| Misc. wiring mods |  | [rails](https://mods.vorondesign.com/detail/ozerX2agbmmnjUP4EdDyQ), [under bed wagos](https://mods.vorondesign.com/detail/Zdq86RuSkhr4bx3xrauw) | |
 | Misc. case mods |  | [hinges](https://mods.vorondesign.com/detail/eeRCH8EJiLrIF5q5l3AQg), [lean supports](https://mods.vorondesign.com/detail/tiIhFDTh9tHJY0JNJK9A), [handles](https://mods.vorondesign.com/detail/EAM1ZiQJCUzXznvOA767w), [magnets mount top](https://www.teamfdm.com/files/file/324-magnetic-panels/), [bottom panel tabs](https://www.teamfdm.com/files/file/134-deck-panel-support-clips/) | |
 | Lights | | [mount segment](https://mods.vorondesign.com/detail/8S6KN4daUCgRhEJEX1stQ), [mount ends](https://github.com/Ramalama2/Voron-2-Mods/tree/main/Deprecated/Misumi_Led_Corners/STL), [idler corners](https://mods.vorondesign.com/detail/zBJTvWc9vSnnQoDDP0hyYw), [z corner covers](https://www.printables.com/model/84736-z-belt-cover-a-for-voron-24) | |
 | power supply mods |  | [double din mount](https://www.teamfdm.com/files/file/457-double-din-lrs200-24-mounts-for-voron-24/), [terminal cover](https://mods.vorondesign.com/detail/jyO8bHoPTy3XUaYlXscB7w) | |
@@ -64,7 +67,11 @@ All mods are also stored in the stl folder for version locking. As I upgrade ver
 
 Download the raspberry pi ![imaging tool](https://www.raspberrypi.com/software/) and follow the steps to edit settings for an appropriate hostname, username, password, timezone, and ssh to format a micro sd card. Then install into the raspberry pi. Follow the rest of the steps over SSH.
 
-TBD - work in progress
+TODO: Complete this section for a fresh install
+1. Install docker (TBD)
+2. Install docker-compose (TBD)
+3. Other TBD
+
 
 ```
 sudo apt-get install gcc-arm-none-eabi dfu-util
@@ -100,66 +107,89 @@ make -f ../configs/toolhead.katapult.config
 cd ..
 ```
 3. Enter DFU mode on the toolhead by holding boot and clicking reset
-4. Run `lsusb` and use the USB ID in the following command to flash the prebuild binary `/bin/toolhead.katapult.bin` or the one created in `/katapult/out/katapult.bin`.
+4. Run `lsusb` and use the USB ID in the following command to flash the pre-built binary `/bin/toolhead.katapult.bin` or the one created in `/katapult/out/katapult.bin`.
 ```
 sudo dfu-util -a 0 -d 0483:df11 -s 0x08000000:mass-erase:force -D ~/CanBoot/out/canboot.bin
 ```
 5. remove usb-c and 5v jumper. Hook back up the 24V power and CAN lines.
 
-#### Building and Installing Klipper on EBB
+#### Building and Installing Klipper on EBB (fresh install or upgrade)
+
+Before updating firmware, you need to ensure the same version of klipper is being used. Create a `.env` file and add the tag that is being used by the klipper app in docker. for example `TAG=v0.12.0-439-g1fc6d214f`. this can be retrieved using:
+```
+docker inspect --format '{{ index .Config.Labels "org.prind.image.version"}}' klipper
+```
 
 1. Run the following commands, or jump to the next step if using the prebuilt binary
 ```
-git clone https://github.com/Klipper3d/klipper.git
-cd klipper
-make -f ../configs/toolhead.klipper.config
-cd ..
+cd ~/core
+docker-compose -f docker-compose.toolhead.build.yml run --rm make
+cp ./klipper/out/klipper.bin toolhead.klipper.bin
 ```
-2. Run the following commands to get the ID of the CAN toolhead
+2. Run the following commands to get into katapult bootloader
 ```
-cd katapult/scripts
-python3 flash_can.py -i can0 -q
+python3 ~/temp/katapult/scripts/flashtool.py -i can0 -r -u 8b07d889b7ef
+python3 ~/temp/katapult/scripts/flashtool.py -i can0 -q	# should show katapult app
 ```
-3. Flash the device over CAN using the prebilt binary `/bin/toolhead.klipper.bin` or the one created in `/klipper/out/klipper.bin`. Replacing the ID found above here.
+If you don't already have your ID, then you need to double click the reset button (back button) on the toolhead to get into this mode. you can then run the query (-q) with same expectations. It will also provide your ID.
+
+3. Flash the binary we create earlier
 ```
-python3 flash_can.py -i can0 -f ~/klipper/out/klipper.bin -u be69315a613c
+python3 ~/temp/katapult/scripts/flashtool.py -i can0 -f klipper/out/klipper.bin -u 8b07d889b7ef
+python3 ~/temp/katapult/scripts/flashtool.py -i can0 -q	# should show klipper app
 ```
-4. Confirm klipper is installed using the command in step 2. Should now report `Application: klipper`
-5. Cycle power
+4. Cycle power
 
 ### Setup Octopus MCU
 
-1. Run the following commands, or jump to the next step if using the prebuilt binary
+Before updating firmware, you need to ensure the same version of klipper is being used. Create a `.env` file and add the tag that is being used by the klipper app in docker. for example `TAG=v0.12.0-439-g1fc6d214f`. this can be retrieved using:
 ```
-git clone https://github.com/Klipper3d/klipper.git
-cd klipper
-make -f ../configs/octopus.klipper.config
-cd ..
+docker inspect --format '{{ index .Config.Labels "org.prind.image.version"}}' klipper
 ```
 
-More Steps TBD
+1. Run the following commands, or jump to the next step if using the prebuilt binary
+```
+cd ~/core
+docker-compose -f docker-compose.octopus.build.yml run --rm make
+cp ./klipper/out/klipper.bin octopus.klipper.bin
+```
+2. Use the samba share to copy the bin to a sd-card on your computer. rename the file `firmware.bin`.
+3. Insert the sd-card into your octopus mcu and reboot (cycle power)
+4. Wait 5 minutes, power down and remove sd-card. power back on
+5. validate there is no longer a `firmware.bin` on the sd-card
 
 ## Klipper Configuration
 
-TBD
+TODO: list here any parameters that need to be adjusted from the `klipper.cfg` included.
 
-## Inital Setup and Test
+## Initial Setup and Test
 
 Once wiring and software are up and going, run through the tests and setup on:
-- https://www.klipper3d.org/Rotation_Distance.html
+
+- https://ellis3dp.com/Print-Tuning-Guide
 - https://www.klipper3d.org/Config_checks.html
 
-Anytime something changes that can effect the thermals of the printer, pid calibration is needed. changing sensors, hotends, et would require this. The following command can be run in fluidd terminal and will output new pid values to be added into the printer.cfg. 
+Anytime something changes that can effect the thermals of the printer, pid calibration is needed. changing sensors, hotends, etc would require this. The following command can be run in fluidd terminal and will output new pid values to be added into the printer.cfg. 
 ```
-PID_CALIBRATE HEATER=extruder TARGET=230
+PID_CALIBRATE HEATER=extruder TARGET=260
 
 or
 
-PID_CALIBRATE HEATER=heater_bed TARGET=110
+PID_CALIBRATE HEATER=heater_bed TARGET=105
 ```
-
-https://all3dp.com/2/klipper-z-offset-simply-explained/
 
 ## Slicing
 
-TBD
+TODO: add slicer specific settings and steps to do. OrcaSlicer configuration steps are a good one.
+
+## MISC. help and references
+
+If you run into any CAN related issues, read through the following sites: 
+- https://canbus.esoterical.online
+- https://github.com/Arksine/katapult
+
+If you run into tuning related issues, read through the Ellis guide, multiple times: 
+- https://ellis3dp.com/Print-Tuning-Guide
+
+
+Much of the docker code is from the following repo with some improvements committed back to the author via issues. Strongly suggest using the docker compose files here if you don't want to use my more opinionated setup. https://github.com/mkuf/prind

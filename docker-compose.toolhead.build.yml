@@ -1,0 +1,11 @@
+services:
+  make:
+    image: mkuf/klipper:${TAG:-latest}-tools
+    tty: true
+    privileged: true
+    entrypoint: make
+    working_dir: /opt/klipper
+    volumes:
+      - /dev:/dev
+      -  ${INSTALLDIR}/klipper/config/toolhead.klipper.config:/opt/klipper/.config
+      -  ${INSTALLDIR}/klipper/out:/opt/klipper/out

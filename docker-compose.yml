@@ -26,26 +26,31 @@ services:
     networks:
       - proxyprotected
 
-  files:
-    container_name: files
-    image: filebrowser/filebrowser:s6
-    restart: always
-    mem_limit: 512mb
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - FB_BASEURL=/host
-      - FB_NOAUTH=true
-    volumes:
-      - ${INSTALLDIR}:/srv
-    labels:
-      - traefik.enable=true
-      - "traefik.http.routers.files.rule=PathPrefix(`/host`)"
-      - "traefik.http.routers.files.entrypoints=web" 
-    networks:
-      - proxyprotected
 
+  samba:
+    container_name: samba
+    image: dperson/samba
+    privileged: true
+    stdin_open: true
+    network_mode: "host"
+    tty: true
+    restart: always
+    environment:
+      TZ: "America/Toronto"
+      NMBD: "true"
+    volumes:
+      - ${INSTALLDIR}:/mount:z
+    command: >-
+      -s "mount;/mount;yes;no;yes;all;none;;comment1"
+    ports:
+      - "137:137/udp" # required to advertise shares (NMBD)
+      - "138:138/udp" # required to advertise shares (NMBD)
+      - "139:139/tcp" # default smb port
+      - "445:445/tcp" # default smb port
+    tmpfs:
+      - /tmp
+
+  
   moonraker:
     container_name: moonraker
     image: mkuf/moonraker:latest
@@ -67,8 +72,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.moonraker.loadbalancer.server.port=7125
-      - "traefik.http.routers.moonraker.rule=PathPrefix(`/websocket`,`/printer`,`/api`,`/access`,`/machine`,`/server`)"
-      - "traefik.http.routers.moonraker.entrypoints=web"
+      - traefik.http.routers.moonraker.rule=PathRegexp(`/(websocket|printer|api|access|machine|server)`)
+      - traefik.http.routers.moonraker.entrypoints=web
     networks:
       - proxyprotected
 
@@ -124,9 +129,9 @@ services:
       - "--slowdown"
       - "--device=/dev/webcam"
       - "--resolution=1080x1440" #720x960"
-      - "--desired-fps=60" #15"
+      - "--desired-fps=30" #15"
       - "--format=MJPEG"
-#      - "--drop-same-frames=30" #15"
+      #- "--drop-same-frames=30" #15"
     depends_on:
       - traefik
     devices:

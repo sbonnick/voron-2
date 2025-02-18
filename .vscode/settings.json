@@ -1,5 +1,19 @@
 {
     "cSpell.words": [
-        "voron"
+        "canboot",
+        "eabi",
+        "flashtool",
+        "fluidd",
+        "Hartk",
+        "Hotend",
+        "hotends",
+        "iface",
+        "katapult",
+        "klipper",
+        "knomi",
+        "lsusb",
+        "txqueuelen",
+        "voron",
+        "wagos"
     ]
 }
