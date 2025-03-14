@@ -15,7 +15,6 @@ TODO:
 - [ ] need to add knomi v2
 - [ ] need to add chamber sensor
 - [ ] consider adding a heat up (120c) and clean of nozzle before the z calibration
-- [ ] tune web camera - framerate is slow
 - [ ] create docker for katapult
 - [ ] fully automate upgrading binaries
 
@@ -26,7 +25,7 @@ TODO:
 | ------------|----------|---------------|------------------|
 | Linux PCB | Pi4 2G - piOS | heat sync | Major |
 | Main MCU PCB | BTT Octopus Pro | | Major |
-| Toolhead PCB | BTT EBB 2240 CAN | [motor mount, pcb cover, cable chain arm](https://github.com/bigtreetech/EBB/tree/master/EBB%20SB2240_2209%20CAN/STL) | Major |
+| Toolhead PCB | BTT EBB 2240 CAN | [motor mount, cable chain arm](https://github.com/bigtreetech/EBB/tree/master/EBB%20SB2240_2209%20CAN/STL), [cable cover](https://www.printables.com/model/1216990-stealthburner-cable-cover-for-sb2209-rp2040) | Major |
 | USB to CAN   | BTT U2C | [mount](https://mods.vorondesign.com/detail/guUSuCXHsOqPH1Xn5cS1Ag) | Major |
 | Extruder Motor | LDO-36STH20 |         | |
 | Z Motors | LDO-42STH48 | | Minor |
@@ -34,7 +33,7 @@ TODO:
 | Hotend | Voron Dragon HF | | |
 | Extrusion support | Titanium Extrusion Backers | | |
 | Kinematic Bed |  | [kinematic parts](https://github.com/tanaes/whopping_Voron_mods/tree/main/kinematic_bed) | |
-| Hotend cleaning | nozzle scrubber | [Parts](https://github.com/VoronDesign/VoronUsers/tree/master/orphaned_mods/printer_mods/edwardyeeks/Decontaminator_Purge_Bucket_%26_Nozzle_Scrubber), [Purge Bucket for Kinematic](https://github.com/Dfdye/Voron_Mods/tree/main/Purge_Bucket_for_WP_Kinetic_Mount) | Minor |
+| Hotend cleaning | nozzle scrubber | [brush wiper](https://www.printables.com/model/768112-voron-24-a1-bambu-silicone-brush-wiper), [brush mount](https://www.printables.com/model/659369-voron-24-purge-bucket-silicon-brush-wiper), [Purge Bucket for Kinematic](https://github.com/Dfdye/Voron_Mods/tree/main/Purge_Bucket_for_WP_Kinetic_Mount) | Minor |
 | Run out sensor | BTT SFS v2.0 Sensor | [mount](https://www.printables.com/model/713155-bigtreetech-smart-filament-sensor-sfs-v20-2020-ext) | Minor |
 | Exhaust | ? | ? | Minor |
 | Air Filter | Nevermore 5 v2 | [parts](https://github.com/nevermore3d/Nevermore_Micro/tree/master/V5_Duo/V2) | Minor |
@@ -169,6 +168,10 @@ Once wiring and software are up and going, run through the tests and setup on:
 - https://ellis3dp.com/Print-Tuning-Guide
 - https://www.klipper3d.org/Config_checks.html
 
+To calibrate dimensions of your printer use the follow pattern:
+
+- [Calistar](https://thangs.com/designer/realdirtdigger/3d-model/Calistar%20%28formerly%20Fleur%20de%20Cali%29%20-%20Open%20source%20printer%20size%20and%20skew%20calibration-1028679)
+
 Anytime something changes that can effect the thermals of the printer, pid calibration is needed. changing sensors, hotends, etc would require this. The following command can be run in fluidd terminal and will output new pid values to be added into the printer.cfg. 
 ```
 PID_CALIBRATE HEATER=extruder TARGET=260
@@ -176,6 +179,11 @@ PID_CALIBRATE HEATER=extruder TARGET=260
 or
 
 PID_CALIBRATE HEATER=heater_bed TARGET=105
+```
+
+Anytime mechanical parts are changed, you need to redo the resonance testing:
+```
+mzv, shaper_freq_y = 33.0
 ```
 
 ## Slicing
