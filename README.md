@@ -190,6 +190,21 @@ mzv, shaper_freq_y = 33.0
 
 TODO: add slicer specific settings and steps to do. OrcaSlicer configuration steps are a good one.
 
+### Cura
+
+If using Cura, install the following Plugins:
+- Settings Guide
+- Linear Advance Settings
+- Mesh Tools
+- Moonraker Connection
+- Settings Exporter
+
+Download the following script and install as per instructions:
+- https://github.com/pedrolamas/klipper-preprocessor
+
+Download latest processor.exe and put on C: path:
+- https://github.com/kageurufu/preprocess_cancellation/releases
+
 ## MISC. help and references
 
 If you run into any CAN related issues, read through the following sites: 

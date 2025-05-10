@@ -2,6 +2,17 @@ version: "3.8"
 
 services:
 
+  #watchtower:
+  #  container_name: watchtower
+  #  image: containrrr/watchtower:latest
+  #  restart: always
+  #  volumes:
+  #    - /var/run/docker.sock:/var/run/docker.sock
+  #  environment:
+  #    - TZ=${TZ}
+  #  command: --schedule "0 0 3 * * *" --cleanup
+
+
   traefik:
     container_name: traefik
     image: traefik:latest
@@ -32,7 +43,6 @@ services:
     image: dperson/samba
     privileged: true
     stdin_open: true
-    network_mode: "host"
     tty: true
     restart: always
     environment:
@@ -49,6 +59,8 @@ services:
       - "445:445/tcp" # default smb port
     tmpfs:
       - /tmp
+    networks:
+      - proxyprotected
 
   
   moonraker:
@@ -126,11 +138,12 @@ services:
     command:
       - "--host=0.0.0.0"
       - "--port=8080"
-      - "--slowdown"
+      #- "--slowdown"
       - "--device=/dev/webcam"
-      - "--resolution=1080x1440" #720x960"
-      - "--desired-fps=30" #15"
-      - "--format=MJPEG"
+      - "--resolution=960x720" #720x960"
+      - "--desired-fps=15"
+      - "--format=YUYV" #MJPEG"
+      #- "--encoder=HW"
       #- "--drop-same-frames=30" #15"
     depends_on:
       - traefik

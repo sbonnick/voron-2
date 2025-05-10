@@ -3,6 +3,7 @@ services:
     image: mkuf/klipper:${TAG:-latest}-tools
     tty: true
     privileged: true
+    network_mode: host
     entrypoint: make
     working_dir: /opt/klipper
     volumes:
