@@ -10,7 +10,6 @@ TODO:
 - [ ] rewire octopus to use usb or CAN
 - [ ] identify the configuration items that need to be adjusted
 - [ ] script binary creation. use docker
-- [ ] add rpi4 setup
 - [ ] more details for the first init setup
 - [ ] need to add knomi v2
 - [ ] need to add chamber sensor
@@ -45,6 +44,7 @@ TODO:
 | power supply mods |  | [double din mount](https://www.teamfdm.com/files/file/457-double-din-lrs200-24-mounts-for-voron-24/), [terminal cover](https://mods.vorondesign.com/detail/jyO8bHoPTy3XUaYlXscB7w) | |
 | Thermistor | PT100 | | Minor |
 | Web Camera | Logitech C920s | [Top Mount](https://mods.vorondesign.com/detail/XgriEYTt4Xl5LeDx5DnPRg) | Major |
+| Umbilical clamps | Canbus | [Clamps](https://makerworld.com/en/models/142656-voron-cable-clamp-umbilical-mod-canbus#profileId-180684) | Minor |
 
 All mods are also stored in the stl folder for version locking. As I upgrade versions these will be upgraded as well based on the original authors revisions.
 
@@ -66,47 +66,85 @@ All mods are also stored in the stl folder for version locking. As I upgrade ver
 
 Download the raspberry pi ![imaging tool](https://www.raspberrypi.com/software/) and follow the steps to edit settings for an appropriate hostname, username, password, timezone, and ssh to format a micro sd card. Then install into the raspberry pi. Follow the rest of the steps over SSH.
 
-TODO: Complete this section for a fresh install
-1. Install docker (TBD)
-2. Install docker-compose (TBD)
-3. Other TBD
-
-
+Following SSH into the new machine, run the following:
 ```
+sudo apt update
+sudo apt upgrade -y
+curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
 sudo apt-get install gcc-arm-none-eabi dfu-util
 ```
+
+### Setup UART
+
+1. Disable bt
+```
+sudo nano /boot/firmware/config.txt
+```
+2. add the following
+```
+dtoverlay=disable-bt
+```
+3. remove `console=serial0,115200` from cmdLine.txt file
+```
+sudo nano /boot/firmware/cmdline.txt
+```
+4. reboot
+
+### Setup U2C
+
+1. Enter the following command to setup the CAN Network
+```
+sudo systemctl enable systemd-networkd
+sudo systemctl start systemd-networkd
+sudo systemctl disable systemd-networkd-wait-online.service
+echo -e 'SUBSYSTEM=="net", ACTION=="change|add", KERNEL=="can*"  ATTR{tx_queue_len}="128"' | sudo tee /etc/udev/rules.d/10-can.rules > /dev/null
+echo -e "[Match]\nName=can*\n\n[CAN]\nBitRate=1M\n\n[Link]\nRequiredForOnline=no" | sudo tee /etc/systemd/network/25-can.network > /dev/null
+sudo reboot now
+
+```
+2. Install repos we know we will need to use
+```
+git clone https://github.com/Arksine/katapult.git
+git clone https://github.com/sbonnick/voron-2.git
+
+```
+3. Setup docker stack
+```
+mkdir -p ~/core/klipper/log
+mkdir -p ~/core/klipper/config
+mkdir -p ~/core/klipper/moonraker-db
+nano ~/core/.env
+```
+4. Add the following content to the .env
+```
+PUID=1000
+PGID=1000
+TZ="America/Toronto"
+INSTALLDIR=/home/administrator/core
+```
+5. Copy specific files
+```
+cp ~/voron-2/docker-compose.* ~/core/
+cp ~/voron-2/configs/klipper/* ~/core/klipper/config/
+```
+6. Modify docker compose file and klipper configs accordingly
 
 ### Setup Toolhead MCU
 
 To reduce wiring complexity and portability, I have replaced my hardwired toolhead with BTTs EBB 2240 CAN board. If you are using a hard wired setup using something like a Hartk PCB, you can ignore these setup steps since your toolhead will not have a independent MCU. Caution though, your wiring will look very different as a result. refer to a older check-in here if you want to see my legacy Hartk PCB setup.
-
-#### Setup U2C
-
-1. Enter the following command to setup the CAN Network
-```
-sudo nano /etc/network/interfaces.d/can0
-```
-2. Enter this content into the file
-```
-auto can0
-iface can0 can static
- bitrate 1000000
- up ifconfig $IFACE txqueuelen 1024
-```
-3. reboot the device
 
 #### Building and Installing Katapult (Canboot) on EBB
 
 1. Ensure 24V power and CAN lines are unplugged. Plug usb-c into the EBB 2240 and set the usb-c 5v power jumper
 2. Run the following commands, or jump to the next step if using the prebuilt binary
 ```
-git clone https://github.com/Arksine/katapult.git
 cd katapult
 make -f ../configs/toolhead.katapult.config
 cd ..
 ```
 3. Enter DFU mode on the toolhead by holding boot and clicking reset
-4. Run `lsusb` and use the USB ID in the following command to flash the pre-built binary `/bin/toolhead.katapult.bin` or the one created in `/katapult/out/katapult.bin`.
+4. Run `lsusb` and use the USB ID in the following command to flash the pre-built binary `~/voron-2/bin/toolhead.katapult.bin` or the one created in `~/katapult/out/katapult.bin`.
 ```
 sudo dfu-util -a 0 -d 0483:df11 -s 0x08000000:mass-erase:force -D ~/CanBoot/out/canboot.bin
 ```
@@ -127,15 +165,15 @@ cp ./klipper/out/klipper.bin toolhead.klipper.bin
 ```
 2. Run the following commands to get into katapult bootloader
 ```
-python3 ~/temp/katapult/scripts/flashtool.py -i can0 -r -u 8b07d889b7ef
-python3 ~/temp/katapult/scripts/flashtool.py -i can0 -q	# should show katapult app
+python3 ~/katapult/scripts/flashtool.py -i can0 -r -u 8b07d889b7ef
+python3 ~/katapult/scripts/flashtool.py -i can0 -q	# should show katapult app
 ```
 If you don't already have your ID, then you need to double click the reset button (back button) on the toolhead to get into this mode. you can then run the query (-q) with same expectations. It will also provide your ID.
 
 3. Flash the binary we create earlier
 ```
-python3 ~/temp/katapult/scripts/flashtool.py -i can0 -f klipper/out/klipper.bin -u 8b07d889b7ef
-python3 ~/temp/katapult/scripts/flashtool.py -i can0 -q	# should show klipper app
+python3 ~/katapult/scripts/flashtool.py -i can0 -f ~/voron-2/bin/toolhead.klipper.bin -u 8b07d889b7ef
+python3 ~/katapult/scripts/flashtool.py -i can0 -q	# should show klipper app
 ```
 4. Cycle power
 
@@ -183,7 +221,7 @@ PID_CALIBRATE HEATER=heater_bed TARGET=105
 
 Anytime mechanical parts are changed, you need to redo the resonance testing:
 ```
-mzv, shaper_freq_y = 33.0
+SHAPER_CALIBRATE
 ```
 
 ## Slicing
@@ -191,6 +229,8 @@ mzv, shaper_freq_y = 33.0
 TODO: add slicer specific settings and steps to do. OrcaSlicer configuration steps are a good one.
 
 ### Cura
+
+Install cura from: https://ultimaker.com/software/ultimaker-cura/
 
 If using Cura, install the following Plugins:
 - Settings Guide
@@ -205,6 +245,39 @@ Download the following script and install as per instructions:
 Download latest processor.exe and put on C: path:
 - https://github.com/kageurufu/preprocess_cancellation/releases
 
+Setup machine called `Voron2 350`
+1. X,Y,Z = 350.0
+2. Build plate shape = Rectangular
+3. Origin at center, Headed build volume = off
+4. Heated Bed = on
+5. G-code flavor = Marlin
+6. Printhead: Xmin = -35, Ymin = -50, Xmax = 35, Ymax = 65, Gantry Height = 30.0, #extruders = 1, Apply offsets = on
+7. Start G-code:
+`print_start EXTRUDER={material_print_temperature_layer_0} BED={material_bed_temperature_layer_0} CHAMBER={build_volume_temperature}`
+8. End G-code:
+`print_end`
+9. Nozzle settings: 1.75, 0, 0, 0, 0, 0.  No start or end codes
+
+Setup moonraker
+1. http://192.168.10.226/  (or whatever your local FIXED IP is)
+2. upload: UFB with thumbnail, Upload dialog
+
+Setup Profiles:
+1. Navigate to profiles
+2. import ABSplus.curaprofile and PLA.curaprofile from `slicers > cura` folder
+3. when ever printing, select `Generic PLA` or `Generic ABS`, and `V6 0.40mm`. then select the corresponding profile
+4. adjust support or adhesion settings as needed - should not have to change anything else
+
+Setup Preprocessor:
+1. navigate to extension > post processing scripts
+2. Add klipper preprocessor script
+3. print stats info = on
+4. timelapse take frame = off
+5. use proprocess cancellation = on
+6. path = C:\preprocess_cancellation.exe
+7. timeout =  600
+8. klipper estimator = off
+
 ## MISC. help and references
 
 If you run into any CAN related issues, read through the following sites: 
@@ -214,5 +287,10 @@ If you run into any CAN related issues, read through the following sites:
 If you run into tuning related issues, read through the Ellis guide, multiple times: 
 - https://ellis3dp.com/Print-Tuning-Guide
 
+General build guides:
+- https://github.com/VoronDesign/Voron-2/blob/Voron2.4/Manual/Assembly_Manual_2.4r2.pdf
+- https://github.com/bigtreetech/docs/blob/master/docs/EBB%202240%202209%20CAN.md
+- https://github.com/bigtreetech/docs/blob/master/docs/Octopus%20Pro.md
+- https://github.com/bigtreetech/EBB/blob/master/EBB%20SB2240_2209%20CAN/Build%20Guide/EBB%20SB2240%202209%20CAN%20V1.0%20build%20guide_20240219.pdf
 
 Much of the docker code is from the following repo with some improvements committed back to the author via issues. Strongly suggest using the docker compose files here if you don't want to use my more opinionated setup. https://github.com/mkuf/prind
